@@ -1,0 +1,32 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint"],
+	"extends": ["prettier"],
+	"ignorePatterns": ["*.log"],
+	"parserOptions": {
+		"ecmaVersion": "latest",
+		"sourceType": "module",
+		"project": "./tsconfig.json"
+	},
+	"env": {
+		"node": true
+	},
+	"globals": {
+		"NODE_ENV": true,
+		"isProduction": true,
+		"__ROUTE__": true
+	},
+	"rules": {
+		"max-classes-per-file": "off"
+	},
+	"overrides": [
+		{
+			"files": ["src/scripts/*.ts", "src/views/*.ts"],
+			"rules": {
+				"no-console": "off",
+				"quotes": "off",
+				"@typescript-eslint/quotes": "off"
+			}
+		}
+	]
+}

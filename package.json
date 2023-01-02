@@ -1,0 +1,47 @@
+{
+	"name": "lendsqrssessment",
+	"version": "1.0.0",
+	"main": "./build/bin/www/server.js",
+	"repository": "https://github.com/john9384/lendsqrssessment.git",
+	"author": "John Damilola Ogungbure <jogungbure@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"start": "npm run build && tsc --project . && node .",
+		"serve": "node -r dotenv/config build/bin/www/server.js ",
+		"build": "npm run clean && tsc --project .",
+		"watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+		"watch-node": "nodemon src/bin/www/server.ts",
+		"watch-ts": "tsc -w",
+		"clean": "rm -rf ./build",
+		"lint": "eslint src/**/*.ts",
+		"lint:fix": "eslint src/**/*.ts --fix"
+	},
+	"dependencies": {
+		"@types/bcryptjs": "^2.4.2",
+		"@types/cookie-parser": "^1.4.3",
+		"@types/cors": "^2.8.13",
+		"@types/jsonwebtoken": "^9.0.0",
+		"@types/morgan": "^1.9.4",
+		"bcryptjs": "^2.4.3",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"dotenv": "^16.0.3",
+		"express": "^4.18.2",
+		"helmet": "^6.0.1",
+		"joi": "^17.7.0",
+		"jsonwebtoken": "^9.0.0",
+		"morgan": "^1.10.0",
+		"winston": "^3.8.2",
+		"winston-daily-rotate-file": "^4.7.1"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.48.0",
+		"@typescript-eslint/parser": "^5.48.0",
+		"concurrently": "^7.6.0",
+		"eslint": "^8.31.0",
+		"eslint-config-prettier": "^8.6.0",
+		"husky": "^8.0.2",
+		"prettier": "^2.8.1",
+		"typescript": "^4.9.4"
+	}
+}
