@@ -8,4 +8,4 @@ interface Wallet {
 
 class WalletModel extends BaseModel<Wallet> {}
 
-export const Wallet = new WalletModel('wallets')
+export default new WalletModel('wallets')
