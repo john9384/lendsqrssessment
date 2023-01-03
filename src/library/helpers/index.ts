@@ -3,6 +3,7 @@ export { Logger } from './Logger'
 export { catchErrors } from './catchErrors'
 export { lowerCase, upperCase, capitalizeString } from './stringFormatter'
 export { jwtEncode, jwtDecode } from './jwt'
+export { bcryptEncode, bcryptCompare } from './bcrypt'
 export {
 	AppError,
 	ApiError,

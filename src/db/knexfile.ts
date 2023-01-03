@@ -1,8 +1,6 @@
 import type { Knex } from 'knex'
 import config from './config'
 
-// Update with your config settings.
-
 const knexConfig: { [key: string]: Knex.Config } = {
 	development: {
 		client: 'mysql2',
