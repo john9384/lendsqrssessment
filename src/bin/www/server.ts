@@ -7,9 +7,7 @@ import ConnectDatabase from '../../db/connectDB'
 const PORT = config.app.PORT || 4000
 const app = Application()
 
-ConnectDatabase()
-	.then(() => {})
-	.catch(err => Logger.error(err))
+ConnectDatabase().catch(err => Logger.error(err))
 
 new http.Server(app).listen(PORT, () => {
 	Logger.info(`
