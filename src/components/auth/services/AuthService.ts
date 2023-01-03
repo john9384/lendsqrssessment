@@ -1,34 +1,21 @@
-import { User } from '../../user/models/UserModel'
-import {
-	bcryptEncode,
-	bcryptCompare,
-	jwtEncode,
-} from '../../../library/helpers'
+import { bcryptCompare, jwtEncode } from '../../../library/helpers'
 import { BadRequestError } from '../../../library/helpers/error'
+import { userService } from '../../user/services'
 
 class AuthService {
 	public async signup(formData: any) {
-		console.log('Should not get here')
-		const { firstname, lastname, email, password } = formData
-		const existingUser = await User.read({ email })
+		const existingUser = await userService.getUser({ email: formData.email })
 
 		if (existingUser) throw new BadRequestError('User already registered')
 
-		const encryptedPassword = bcryptEncode(password)
+		const newUser = await userService.createUser(formData)
 
-		await User.create({
-			firstname,
-			lastname,
-			email,
-			password: encryptedPassword,
-		})
-
-		return { email: formData.email }
+		return { email: newUser.email }
 	}
 
 	public async login(formData: any) {
 		const { email, password } = formData
-		const existingUser = await User.read({ email })
+		const existingUser = await userService.getUser({ email })
 
 		if (!existingUser) throw new BadRequestError('Invalid Credentials')
 
