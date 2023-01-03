@@ -25,7 +25,7 @@ export default (
 				.join(',')
 			Logger.error(`${req.method} ${req.baseUrl}${req.url} => ${message}`)
 
-			next(new BadRequestError(message))
+			throw new BadRequestError(message)
 		} catch (error) {
 			next(error)
 		}

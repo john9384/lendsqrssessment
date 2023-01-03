@@ -2,7 +2,7 @@ import knex from 'knex'
 import { Logger } from '../library/helpers'
 import config from './config'
 
-const db = knex({
+export const db = knex({
 	client: 'mysql2',
 	connection: {
 		host: config.DB_HOST,
