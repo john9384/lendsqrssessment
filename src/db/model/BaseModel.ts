@@ -17,6 +17,11 @@ export class BaseModel<T extends {}> {
 		return entity
 	}
 
-	public async update() {}
+	public async update(query: any, data: any) {
+		await db<T>(this.tableName).where(query).update(data)
+		const updatedEntity = await this.read(query)
+		return updatedEntity
+	}
+
 	public async destroy() {}
 }

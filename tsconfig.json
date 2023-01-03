@@ -13,8 +13,9 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"strictPropertyInitialization": false,
-		"typeRoots": ["./src/app/types", "./node_modules/@types"]
+		"typeRoots": ["./node_modules/@types", "./src/app/types"]
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
+	"files": ["src/types/express/appRequest.d.ts"]
 }

@@ -17,7 +17,7 @@
 		"lint:fix": "eslint src/**/*.ts --fix",
 		"knex": "npx knex --knexfile ./src/db/knexfile.ts",
 		"db:create-migration": "npx knex --knexfile ./src/db/knexfile.ts migrate:make",
-		"db:migrate": "npx knex --knexfile ./src/db/knexfile.ts migrate:up"
+		"db:migrate": "npx knex --knexfile ./src/db/knexfile.ts migrate:latest"
 	},
 	"dependencies": {
 		"@types/bcryptjs": "^2.4.2",

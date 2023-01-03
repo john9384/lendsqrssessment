@@ -7,10 +7,11 @@ export async function up(knex: Knex): Promise<void> {
 		table.string('lastname')
 		table.string('email').unique()
 		table.string('password')
-		table.timestamps(true).defaultTo(knex.fn.now())
+		table.timestamps(true)
 	})
 }
 
 export async function down(knex: Knex): Promise<void> {
 	await knex.schema.dropTable('users')
 }
+// .defaultTo(knex.fn.now())
