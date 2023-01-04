@@ -25,6 +25,7 @@
 		"@types/cors": "^2.8.13",
 		"@types/jsonwebtoken": "^9.0.0",
 		"@types/morgan": "^1.9.4",
+		"axios": "^1.2.2",
 		"bcryptjs": "^2.4.3",
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",

@@ -1,10 +1,17 @@
 import Transaction from '../models/Transaction'
 
 class TransactionService {
-	public async create({ userId, walletId, type, status }: any) {
-		await Transaction.create({ userId, walletId, type, status })
+	public async create({ userId, walletId, amount, type, referenceId }: any) {
+		await Transaction.create({
+			userId,
+			walletId,
+			amount,
+			type,
+			status: 'PENDING',
+			referenceId,
+		})
 
-		return { status }
+		return { referenceId }
 	}
 	public async update(query: any, payload: any) {
 		const updatedTransaction = await Transaction.update(query, payload)

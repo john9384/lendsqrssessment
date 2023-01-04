@@ -24,6 +24,10 @@ const config = {
 		level: process.env.LOG_LEVEL || 'silly',
 		directory: process.env.LOG_DIRECTORY,
 	},
+	paystack: {
+		baseUrl: process.env.PAYSTACK_BASE_URL,
+		secret: process.env.PAYSTACK_SECRET,
+	},
 }
 
 export default config
