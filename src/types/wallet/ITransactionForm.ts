@@ -4,6 +4,7 @@ export type ITransactionStatus = 'PENDING' | 'SUCCESS' | 'FAILED'
 export interface ICreateTransaction {
 	userId: number
 	walletId: number
+	recipientId?: number
 	amount: number
 	type: ITransactionType
 	status?: ITransactionStatus

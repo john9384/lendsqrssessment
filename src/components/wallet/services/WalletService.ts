@@ -29,7 +29,7 @@ class WalletService implements IWalletService {
 
 	public async deposit(payload: TransactionBasePayload) {
 		const { userId, amount } = payload
-		const wallet = await this.getWallet({ userId })
+		const wallet = (await this.getWallet({ userId })) as IWallet
 
 		const paystackData = await paystackService.initalizePayment({
 			amount: Number(amount),
