@@ -1,21 +1,33 @@
-import { userService } from '../../user/services'
+import * as uuid from 'uuid'
 import { Wallet } from '../models'
+import { Transaction } from '../models'
+import { IUser } from '../../../types/user'
+import { userService } from '../../user/services'
+import { paystackService, transactionService } from '.'
+import {
+	IWallet,
+	IWalletService,
+	TransactionBasePayload,
+	Transfer,
+} from '../../../types/wallet'
 import { BadRequestError } from '../../../library/helpers/error'
-import { paystackService } from '.'
-import Transaction from '../models/Transaction'
-import UserService from '../../user/services/UserService'
 
-class WalletService {
+class WalletService implements IWalletService {
 	public async createWallet(userId: number) {
-		await Wallet.create({
+		const newWallet = await Wallet.create({
 			userId,
 			balance: 0,
 		})
 
-		return { msg: 'Wallet created' }
+		return newWallet
 	}
 
-	public async deposit(payload: any) {
+	public async getWallet(query: Partial<IWallet>) {
+		const wallet = await Wallet.read(query)
+		return wallet
+	}
+
+	public async deposit(payload: TransactionBasePayload) {
 		const { userId, amount } = payload
 		const wallet = await this.getWallet({ userId })
 
@@ -24,7 +36,7 @@ class WalletService {
 			email: 'ogungburedamilola@gmail.com',
 		})
 
-		await Transaction.create({
+		await transactionService.createTransaction({
 			userId,
 			walletId: wallet?.id,
 			amount: Number(amount),
@@ -33,93 +45,38 @@ class WalletService {
 		})
 
 		return {
-			authorization_url: paystackData.authorization_url,
+			paymentAuthUrl: paystackData.authorization_url,
 		}
 	}
 
-	public async completeTransaction(referenceId: any) {
-		const transaction = await Transaction.read({ referenceId })
-		console.log(transaction)
-
-		if (
-			!transaction ||
-			transaction.status == 'SUCCESS' ||
-			transaction.status == 'FAILED'
-		) {
-			throw new BadRequestError('Invalid transaction')
-		}
-
-		const transactionType = transaction.type
-		const wallet = await Wallet.read({ userId: transaction.userId })
-
-		switch (transactionType) {
-			case 'CREDIT':
-				const crediteddWallet = await this.addToBalance(
-					transaction.userId,
-					Number(wallet?.balance),
-					transaction.amount,
-				)
-
-				await Transaction.update({ id: transaction.id }, { status: 'SUCCESS' })
-				return { balance: crediteddWallet?.balance }
-
-			case 'DEBIT':
-				const debitedWallet = await this.deductFromBalance(
-					transaction.userId,
-					Number(wallet?.balance),
-					transaction.amount,
-				)
-
-				await Transaction.update({ id: transaction.id }, { status: 'SUCCESS' })
-				return { balance: debitedWallet?.balance }
-
-			default:
-				await Transaction.update({ id: transaction.id }, { status: 'FAILED' })
-				return {}
-		}
-	}
-
-	public async withdraw(payload: any) {
+	public async withdraw(payload: TransactionBasePayload) {
 		const { userId, amount } = payload
-		// const user = await UserService.getUser({ id: userId })
 		const wallet = await this.getWallet({ userId })
-		const currentBalance = Number(wallet?.balance)
 
-		if (currentBalance < Number(amount))
+		if (!wallet)
+			throw new BadRequestError(
+				'There is no wallet associated with this account',
+			)
+
+		if (wallet.balance < Number(amount))
 			throw new BadRequestError("You don't have enough balance")
 
-		console.log('gets here')
-		const transferRecipient = await paystackService.createTransferRecipient({
-			name: 'John Ogungbure',
-			account_number: '0220401275',
-			// account_number: 0220401275,
-			bank_code: 58,
-			currency: 'NGN',
-		})
-
-		const paystackData = await paystackService.initiateTransfer({
-			amount: Number(amount),
-			recipient: transferRecipient.id,
-			reason: 'A test',
-		})
-
-		await Transaction.create({
-			userId,
-			walletId: wallet?.id,
-			amount: Number(amount),
-			type: 'DEBIT',
-			referenceId: paystackData.reference,
-		})
+		const updatedBalance = Number(wallet.balance) - Number(amount)
+		const updatedWallet = await this.updateWallet(
+			{ userId },
+			{ balance: updatedBalance },
+		)
 
 		return {
-			authorization_url: paystackData.authorization_url,
+			balance: updatedWallet.balance,
 		}
 	}
 
-	public async transfer(payload: any) {
+	public async transfer(payload: Transfer) {
 		const { userId, amount, recieverEmail } = payload
-		const wallet = await this.getWallet({ userId })
-		const currentBalance = Number(wallet?.balance)
+		const wallet = (await this.getWallet({ userId })) as IWallet
+
+		const currentBalance = Number(wallet.balance)
 
 		if (currentBalance < Number(amount))
 			throw new BadRequestError("You don't have enough balance")
@@ -131,57 +88,117 @@ class WalletService {
 		if (!recieverWallet)
 			throw new BadRequestError('There is a problem with reciever acccount')
 
-		// widthdraw from current user
-		const updatedWallet = await this.deductFromBalance(
-			userId,
-			currentBalance,
-			amount,
+		// debit current user
+		const debitedBalance = Number(wallet.balance) - Number(amount)
+		const updatedWallet = await this.updateWallet(
+			{ userId },
+			{ balance: debitedBalance },
 		)
 
-		// deposit to recievers wallet
-		await this.addToBalance(reciever.id, recieverWallet.balance, amount)
+		// register trannsaction
+		await transactionService.createTransaction({
+			userId,
+			recipientId: reciever.id,
+			walletId: wallet?.id,
+			amount: Number(amount),
+			type: 'DEBIT',
+			status: 'SUCCESS',
+			referenceId: uuid.v4(),
+		})
+
+		// credit recievers wallet
+		const recieverCreditedBalance =
+			Number(recieverWallet.balance) + Number(amount)
+
+		await this.updateWallet(
+			{ userId: reciever.id },
+			{ balance: recieverCreditedBalance },
+		)
+
+		// register transaction
+		await transactionService.createTransaction({
+			userId: reciever.id,
+			recipientId: userId,
+			walletId: recieverWallet.id,
+			amount: Number(amount),
+			type: 'CREDIT',
+			status: 'SUCCESS',
+			referenceId: uuid.v4(),
+		})
 
 		return {
-			balance: updatedWallet?.balance,
+			balance: updatedWallet.balance,
 		}
 	}
 
-	public async getWallet(query: any) {
-		const wallet = await Wallet.read(query)
-		return wallet
+	public async completeTransaction(referenceId: string) {
+		const transaction = await Transaction.read({ referenceId })
+
+		if (
+			!transaction ||
+			transaction.status == 'SUCCESS' ||
+			transaction.status == 'FAILED'
+		) {
+			throw new BadRequestError('Invalid transaction')
+		}
+
+		const transactionType = transaction.type
+		const wallet = (await Wallet.read({
+			userId: transaction.userId,
+		})) as IWallet
+
+		switch (transactionType) {
+			case 'CREDIT':
+				const creditedBalance =
+					Number(wallet.balance) + Number(transaction.amount)
+
+				const crediteddWallet = await this.updateWallet(
+					{ userId: transaction.userId },
+					{ balance: creditedBalance },
+				)
+
+				await transactionService.updateTransaction(
+					{ id: transaction.id },
+					{ status: 'SUCCESS' },
+				)
+				return { balance: crediteddWallet.balance }
+
+			case 'DEBIT':
+				const debitedBalance =
+					Number(wallet.balance) - Number(transaction.amount)
+
+				const debitedWallet = await this.updateWallet(
+					{ userId: transaction.userId },
+					{ balance: debitedBalance },
+				)
+
+				await transactionService.updateTransaction(
+					{ id: transaction.id },
+					{ status: 'SUCCESS' },
+				)
+				return { balance: debitedWallet.balance }
+
+			default:
+				await transactionService.updateTransaction(
+					{ id: transaction.id },
+					{ status: 'FAILED' },
+				)
+				return { balance: wallet.balance }
+		}
 	}
 
-	private async checkExistingUser(query: any) {
+	private async updateWallet(
+		query: Partial<IWallet>,
+		data: Partial<IWallet>,
+	): Promise<IWallet> {
+		const updatedWallet = await Wallet.update(query, data)
+
+		return updatedWallet
+	}
+
+	private async checkExistingUser(query: Partial<IUser>) {
 		const user = await userService.getUser(query)
 		return user
-	}
-
-	private async addToBalance(
-		userId: number,
-		currentBalance: number,
-		amount: number,
-	) {
-		const newBalance = currentBalance + amount
-		const updatedWallet = await Wallet.update(
-			{ userId },
-			{ balance: newBalance },
-		)
-
-		return updatedWallet
-	}
-
-	private async deductFromBalance(
-		userId: number,
-		currentBalance: number,
-		amount: number,
-	) {
-		const newBalance = currentBalance - amount
-		const updatedWallet = await Wallet.update(
-			{ userId },
-			{ balance: newBalance },
-		)
-
-		return updatedWallet
 	}
 }
 

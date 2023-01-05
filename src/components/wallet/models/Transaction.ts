@@ -1,16 +1,8 @@
 import { BaseModel } from '../../../db/model/BaseModel'
+import { ITransaction, ITransactionModel } from '../../../types/wallet'
 
-interface Transaction {
-	id: number
-	userId: number
-	walletId: number
-	recipientId?: number
-	amount: number
-	type: 'CREDIT' | 'DEBIT'
-	status: 'PENDING' | 'SUCCESS' | 'FAILED'
-	referenceId: string
-}
-
-class TransactionModel extends BaseModel<Transaction> {}
+class TransactionModel
+	extends BaseModel<ITransaction>
+	implements ITransactionModel<ITransaction> {}
 
 export default new TransactionModel('transactions')
