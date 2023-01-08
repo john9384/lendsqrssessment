@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { Logger } from './Logger'
+import { default as Logger } from './logger'
 
 export interface ResponseData {
 	success?: boolean

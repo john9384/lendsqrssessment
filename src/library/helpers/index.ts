@@ -1,5 +1,5 @@
 // export { getSignedUrl } from './aws'
-export { Logger } from './Logger'
+export { default as Logger } from './logger'
 export { catchErrors } from './catchErrors'
 export { lowerCase, upperCase, capitalizeString } from './stringFormatter'
 export { jwtEncode, jwtDecode } from './jwt'

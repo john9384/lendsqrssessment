@@ -59,4 +59,4 @@ if (process.env.NODE_ENV !== 'production') {
 	)
 }
 
-export { Logger }
+export default Logger
