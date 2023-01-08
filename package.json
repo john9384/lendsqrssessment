@@ -5,6 +5,9 @@
 	"repository": "https://github.com/john9384/lendsqrssessment.git",
 	"author": "John Damilola Ogungbure <jogungbure@gmail.com>",
 	"license": "MIT",
+	"engines": {
+		"node": "16.14.0"
+	},
 	"scripts": {
 		"start": "npm run build && node .",
 		"serve": "node -r dotenv/config build/bin/www/server.js ",
