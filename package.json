@@ -9,7 +9,7 @@
 		"node": "16.14.0"
 	},
 	"scripts": {
-		"start": "npm run build && node .",
+		"start": "node build/bin/www/server.js",
 		"serve": "node -r dotenv/config build/bin/www/server.js ",
 		"build": "npm run clean && tsc --project .",
 		"watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
