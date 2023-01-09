@@ -15,6 +15,13 @@ walletRouter.post(
 	catchErrors(walletController.deposit),
 )
 
+walletRouter.get(
+	'/complete-deposit',
+	catchErrors(walletController.completeTransaction),
+)
+
+walletRouter.get('/bank-list', catchErrors(walletController.getBankList))
+
 walletRouter.post(
 	'/withdraw',
 	isAuthenticated,
