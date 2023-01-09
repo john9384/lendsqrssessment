@@ -1,9 +1,10 @@
 import { bcryptCompare, jwtEncode } from '../../../library/helpers'
 import { BadRequestError } from '../../../library/helpers/error'
+import { IAuthService, LoginForm, SignupForm } from '../../../types/auth'
 import { userService } from '../../user/services'
 
-class AuthService {
-	public async signup(formData: any) {
+class AuthService implements IAuthService {
+	public async signup(formData: SignupForm) {
 		const existingUser = await userService.getUser({ email: formData.email })
 
 		if (existingUser) throw new BadRequestError('User already registered')
@@ -13,7 +14,7 @@ class AuthService {
 		return { email: newUser.email }
 	}
 
-	public async login(formData: any) {
+	public async login(formData: LoginForm) {
 		const { email, password } = formData
 		const existingUser = await userService.getUser({ email })
 

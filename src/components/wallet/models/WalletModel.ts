@@ -1,11 +1,6 @@
 import { BaseModel } from '../../../db/model/BaseModel'
+import { IWallet, IWalletModel } from '../../../types/wallet'
 
-interface Wallet {
-	id: number
-	userId: number
-	balance: number
-}
+class WalletModel extends BaseModel<IWallet> implements IWalletModel<IWallet> {}
 
-class WalletModel extends BaseModel<Wallet> {}
-
-export const Wallet = new WalletModel('wallets')
+export default new WalletModel('wallets')

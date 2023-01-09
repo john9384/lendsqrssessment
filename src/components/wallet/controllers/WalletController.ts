@@ -1,14 +1,17 @@
 import { Request, Response } from 'express'
 import { SuccessResponse } from '../../../library/helpers'
-import { walletService } from '../services'
+import { paystackService, walletService } from '../services'
+import IWalletController from '../../../types/wallet/IWalletController'
 
-class WalletController {
+class WalletController implements IWalletController {
 	public async deposit(req: Request, res: Response) {
 		const { amount } = req.body
 		const userId = req.auth.id
 		const responseData = await walletService.deposit({ userId, amount })
 
-		return new SuccessResponse('Deposited', responseData).send(res)
+		res.statusCode = 302
+		res.setHeader('Location', responseData.paymentAuthUrl)
+		return res.end()
 	}
 
 	public async withdraw(req: Request, res: Response) {
@@ -29,6 +32,21 @@ class WalletController {
 		})
 
 		return new SuccessResponse('Transfered', responseData).send(res)
+	}
+
+	public async completeTransaction(req: Request, res: Response) {
+		const referenceId = req.query.reference
+		const responseData = await walletService.completeTransaction(
+			referenceId as string,
+		)
+
+		return new SuccessResponse('Transaction complete', responseData).send(res)
+	}
+
+	public async getBankList(req: Request, res: Response) {
+		const responseData = await paystackService.getListOfBanks()
+
+		return new SuccessResponse('Transaction complete', responseData).send(res)
 	}
 }
 
