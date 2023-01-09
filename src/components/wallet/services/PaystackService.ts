@@ -4,19 +4,18 @@ import config from '../../../config'
 import { Logger } from '../../../library/helpers'
 
 const baseURL = config.paystack.baseUrl
-console.log(baseURL)
 
 export interface IcreateTransferRecipient {
-	// name: string
-	// account_number: string
-	// bank_code: string
-	// currency: string
+	name: string
+	account_number: string
+	bank_code: string
+	currency: string
 	[key: string]: any
 }
 export interface IinitiateTransfer {
-	// amount: number
-	// recipient: string
-	// reason: string
+	amount: number
+	recipient: string
+	reason: string
 	[key: string]: any
 }
 

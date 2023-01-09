@@ -1,8 +1,9 @@
 import { Request, Response } from 'express'
 import { SuccessResponse } from '../../../library/helpers'
 import { authService } from '../services'
+import { IAuthController } from '../../../types/auth'
 
-class AuthController {
+class AuthController implements IAuthController {
 	public async signup(req: Request, res: Response) {
 		const formData = req.body
 		const responseData = await authService.signup(formData)

@@ -1,23 +1,26 @@
-import Transaction from '../models/Transaction'
+import { Transaction } from '../models'
+import {
+	ITransaction,
+	ITransactionService,
+	ICreateTransaction,
+	IUpdateTransaction,
+} from '../../../types/wallet'
 
-class TransactionService {
-	public async create({ userId, walletId, amount, type, referenceId }: any) {
-		await Transaction.create({
-			userId,
-			walletId,
-			amount,
-			type,
-			status: 'PENDING',
-			referenceId,
-		})
+class TransactionService implements ITransactionService {
+	public async createTransaction(payload: ICreateTransaction) {
+		const transaction = await Transaction.create(payload)
 
-		return { referenceId }
+		return { referenceId: payload.referenceId }
 	}
-	public async update(query: any, payload: any) {
+
+	public async updateTransaction(
+		query: Partial<ITransaction>,
+		payload: IUpdateTransaction,
+	) {
 		const updatedTransaction = await Transaction.update(query, payload)
 
 		return {
-			...updatedTransaction,
+			referenceId: updatedTransaction.referenceId,
 		}
 	}
 }
