@@ -9,9 +9,7 @@ class WalletController implements IWalletController {
 		const userId = req.auth.id
 		const responseData = await walletService.deposit({ userId, amount })
 
-		res.statusCode = 302
-		res.setHeader('Location', responseData.paymentAuthUrl)
-		return res.end()
+		return new SuccessResponse('Deposite Initiated', responseData).send(res)
 	}
 
 	public async withdraw(req: Request, res: Response) {
