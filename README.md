@@ -76,3 +76,7 @@ The Transaction model holds the record of every transaction on a wallet
 - type
 - status
 - referenceId
+
+### ER diagram
+
+![ER](/src/assets/er-diagram.png)
