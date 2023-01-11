@@ -3,7 +3,7 @@ import { Wallet } from '../models'
 import { Transaction } from '../models'
 import { IUser } from '../../../types/user'
 import { userService } from '../../user/services'
-import { paystackService, transactionService } from '.'
+import { transactionService } from '.'
 import {
 	IWallet,
 	IWalletService,
@@ -36,6 +36,7 @@ class WalletService implements IWalletService {
 			{ userId },
 			{ balance: updatedBalance },
 		)
+
 		await transactionService.createTransaction({
 			userId,
 			walletId: wallet?.id,
