@@ -41,6 +41,7 @@ class WalletService implements IWalletService {
 			walletId: wallet?.id,
 			amount: Number(amount),
 			type: 'CREDIT',
+			status: 'SUCCESS',
 			referenceId: paystackData.reference,
 		})
 
@@ -66,6 +67,16 @@ class WalletService implements IWalletService {
 			{ userId },
 			{ balance: updatedBalance },
 		)
+
+		// register transaction
+		await transactionService.createTransaction({
+			userId: userId,
+			walletId: wallet.id,
+			amount: Number(amount),
+			type: 'DEBIT',
+			status: 'SUCCESS',
+			referenceId: uuid.v4(),
+		})
 
 		return {
 			balance: updatedWallet.balance,
@@ -131,6 +142,7 @@ class WalletService implements IWalletService {
 		}
 	}
 
+	// Service to handle the hook from payment method
 	public async completeTransaction(referenceId: string) {
 		const transaction = await Transaction.read({ referenceId })
 
