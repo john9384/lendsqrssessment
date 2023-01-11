@@ -8,7 +8,7 @@ const app = Application()
 
 ConnectDatabase().catch(err => Logger.error(err))
 
-new http.Server(app).listen(config.app.PORT || 4000, () => {
+new http.Server(app).listen(process.env.PORT || 4000, () => {
 	Logger.info(`
   -------------------------------------------
     ${config.app.NAME?.toUpperCase()} Server listening on port ${
