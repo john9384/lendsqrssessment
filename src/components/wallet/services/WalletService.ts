@@ -31,22 +31,22 @@ class WalletService implements IWalletService {
 		const { userId, amount } = payload
 		const wallet = (await this.getWallet({ userId })) as IWallet
 
-		const paystackData = await paystackService.initalizePayment({
-			amount: Number(amount),
-			email: 'ogungburedamilola@gmail.com',
-		})
-
+		const updatedBalance = Number(wallet.balance) + Number(amount)
+		const updatedWallet = await this.updateWallet(
+			{ userId },
+			{ balance: updatedBalance },
+		)
 		await transactionService.createTransaction({
 			userId,
 			walletId: wallet?.id,
 			amount: Number(amount),
 			type: 'CREDIT',
 			status: 'SUCCESS',
-			referenceId: paystackData.reference,
+			referenceId: uuid.v4(),
 		})
 
 		return {
-			paymentAuthUrl: paystackData.authorization_url,
+			balance: updatedWallet.balance,
 		}
 	}
 

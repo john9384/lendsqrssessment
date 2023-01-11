@@ -4,7 +4,7 @@ import { TransactionBasePayload, Transfer } from './IWalletForm'
 interface IWalletService {
 	createWallet(userId: number): Promise<IWallet>
 	getWallet(query: Partial<IWallet>): Promise<IWallet | null>
-	deposit(payload: TransactionBasePayload): Promise<{ paymentAuthUrl: string }>
+	deposit(payload: TransactionBasePayload): Promise<{ balance: number }>
 	withdraw(payload: TransactionBasePayload): Promise<{ balance: number }>
 	transfer(payload: Transfer): Promise<{ balance: number }>
 	completeTransaction(referenceId: string): Promise<{ balance: number }>
